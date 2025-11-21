@@ -1,0 +1,14 @@
+fastapi
+uvicorn[standard]
+pydantic
+pydantic-settings
+chromadb
+scrapy
+langchain
+langchain-ollama
+langchain-community
+python-dotenv
+beautifulsoup4
+requests
+langchain-core
+sentence-transformers
