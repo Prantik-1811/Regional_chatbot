@@ -17,7 +17,7 @@ class RAGPipeline:
         # Use Ollama (local LLM - no API key needed!)
         try:
             self.llm = ChatOllama(model="llama3.2", temperature=0)
-            print("✓ Ollama LLM initialized successfully")
+            print("✓ Ollama LLM initialized successfully - DEBUG VERSION 1")
         except Exception as e:
             self.llm = None
             print(f"WARNING: Could not connect to Ollama. Make sure Ollama is running. Error: {e}")
@@ -98,7 +98,13 @@ class RAGPipeline:
                 response = chain.invoke({"context": context, "question": query_text, "region_context": region_context})
                 answer = response.content
             except Exception as e:
-                answer = f"Error calling LLM: {str(e)}. \n\nContext retrieved:\n{context[:500]}..."
+                answer = (
+                    "**⚠️ AI Engine Unavailable**\n\n"
+                    "I could not generate a summarized answer because the local AI engine (Ollama) is not running. "
+                    "Please ensure Ollama is installed and running.\n\n"
+                    "**Here is the relevant information I found from official sources:**\n\n"
+                    f"{context}"
+                )
         else:
             answer = "NOTE: Ollama not available. Showing retrieved context directly:\n\n" + context
             # Truncate if too long for a simple test
