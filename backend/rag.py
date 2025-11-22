@@ -14,19 +14,21 @@ class RAGPipeline:
         self.ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="all-MiniLM-L6-v2")
         self.collection = self.client.get_collection(name="cyber_knowledge_base", embedding_function=self.ef)
         
-        # Use Ollama (local LLM - no API key needed!)
+        # Initialize Ollama client with environment-configured base URL
+        ollama_base_url = os.getenv("OLLAMA_BASE_URL", "http://localhost:11434")
         try:
-            self.llm = ChatOllama(model="llama3.2", temperature=0)
-            print("✓ Ollama LLM initialized successfully - DEBUG VERSION 1")
+            self.llm = ChatOllama(
+                model="llama3.2", 
+                temperature=0,
+                base_url=ollama_base_url
+            )
+            print(f"Connected to Ollama at {ollama_base_url}")
         except Exception as e:
             self.llm = None
-            print(f"WARNING: Could not connect to Ollama. Make sure Ollama is running. Error: {e}")
-            print("Install Ollama from: https://ollama.com/download")
-            print("Then run: ollama pull llama3.2")
+            print(f"Warning: Failed to connect to Ollama at {ollama_base_url}: {e}")
 
     def query(self, query_text: str, region: str = None):
-        # Retrieve top 5 results (increased from 3 for multi-region)
-        # Apply region filter if specified
+        # Query collection with optional region filter
         if region:
             results = self.collection.query(
                 query_texts=[query_text],
@@ -46,8 +48,7 @@ class RAGPipeline:
         metadatas = results['metadatas'][0]
         distances = results['distances'][0]
         
-        # Filter by relevance: only include sources with distance < 1.2 (higher similarity)
-        # L2 distance: 0 = identical, >1.5 = usually irrelevant
+        # Filter results by relevance threshold (L2 distance)
         RELEVANCE_THRESHOLD = 1.2
         
         context_parts = []
@@ -99,10 +100,9 @@ class RAGPipeline:
                 answer = response.content
             except Exception as e:
                 answer = (
-                    "**⚠️ AI Engine Unavailable**\n\n"
-                    "I could not generate a summarized answer because the local AI engine (Ollama) is not running. "
-                    "Please ensure Ollama is installed and running.\n\n"
-                    "**Here is the relevant information I found from official sources:**\n\n"
+                    "**AI Engine Unavailable**\n\n"
+                    "Unable to generate summary. Please ensure the Ollama service is running.\n\n"
+                    "**Relevant Information:**\n\n"
                     f"{context}"
                 )
         else:

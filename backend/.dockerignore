@@ -1,0 +1,38 @@
+# Python cache
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+
+# Virtual environments
+venv/
+env/
+ENV/
+
+# Environment files
+.env
+.env.*
+
+# Testing
+*.log
+test_*.py
+*_test.py
+.pytest_cache/
+.coverage
+
+# Git
+.git/
+.gitignore
+
+# IDE
+.vscode/
+.idea/
+*.swp
+
+# Documentation
+*.md
+!README.md
+
+# Temporary files
+*.tmp
+*.bak

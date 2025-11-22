@@ -13,7 +13,7 @@ function App() {
   const [messages, setMessages] = useState([])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
-  const [selectedRegion, setSelectedRegion] = useState(null) // null = all regions
+  const [selectedRegion, setSelectedRegion] = useState(null)
   const chatEndRef = useRef(null)
 
   const scrollToBottom = () => {
@@ -24,7 +24,6 @@ function App() {
     scrollToBottom()
   }, [messages])
 
-  // Get current theme color
   const themeColor = selectedRegion ? REGIONS[selectedRegion].color : '#6B7280'
 
   const handleSend = async () => {
@@ -36,7 +35,7 @@ function App() {
     setLoading(true)
 
     try {
-      const response = await axios.post('http://localhost:8000/query', {
+      const response = await axios.post('/api/query', {
         query: input,
         region: selectedRegion
       })
@@ -48,13 +47,12 @@ function App() {
       }
       setMessages(prev => [...prev, botMessage])
     } catch (error) {
-      const errorMessage = {
+      console.error('Error querying chatbot:', error)
+      const errorMessage = error.response?.data?.detail || error.message || 'Unknown error'
+      setMessages(prev => [...prev, {
         role: 'bot',
-        content: 'Sorry, I encountered an error. Please try again.',
-        sources: []
-      }
-      setMessages(prev => [...prev, errorMessage])
-      console.error('Error:', error)
+        content: `Error: ${errorMessage}. Please check console/logs.`
+      }])
     } finally {
       setLoading(false)
     }

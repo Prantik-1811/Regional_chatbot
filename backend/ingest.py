@@ -8,7 +8,7 @@ def ingest_data():
     # Initialize ChromaDB client (persistent)
     client = chromadb.PersistentClient(path="./chroma_db")
     
-    # Use default embedding function (all-MiniLM-L6-v2)
+    # Initialize embedding function
     sentence_transformer_ef = embedding_functions.SentenceTransformerEmbeddingFunction(model_name="all-MiniLM-L6-v2")
     
     # Create or get collection
@@ -17,7 +17,7 @@ def ingest_data():
         embedding_function=sentence_transformer_ef
     )
     
-    # Load all JSON files (output.json, output_japan.json, output_nyc.json)
+    # Load scraped data
     json_files = glob.glob("output*.json")
     
     if not json_files:

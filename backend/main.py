@@ -6,7 +6,7 @@ import uvicorn
 
 app = FastAPI(title="HK Cyber Intelligence Chatbot")
 
-# Allow CORS for frontend
+# Configure CORS
 app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],

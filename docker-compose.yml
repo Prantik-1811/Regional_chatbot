@@ -1,0 +1,92 @@
+version: '3.8'
+
+services:
+  # Backend API Service
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    container_name: chatbot-backend
+    restart: always
+    volumes:
+      - chroma_db_data:/app/chroma_db
+    networks:
+      - backend_network
+    healthcheck:
+      test: [ "CMD", "python", "-c", "import requests; requests.get('http://localhost:8000/')" ]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+    environment:
+      - PYTHONUNBUFFERED=1
+      - OLLAMA_BASE_URL=http://ollama:11434
+    depends_on:
+      - ollama
+
+  # Frontend Service
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    container_name: chatbot-frontend
+    restart: always
+    networks:
+      - frontend_network
+    depends_on:
+      backend:
+        condition: service_healthy
+
+  # Nginx Reverse Proxy
+  nginx:
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    container_name: chatbot-nginx
+    restart: always
+    ports:
+      - "80:80"
+      - "443:443"
+    networks:
+      - frontend_network
+      - backend_network
+    depends_on:
+      - backend
+      - frontend
+    # Uncomment volumes below for SSL certificates
+    # volumes:
+    #   - ./ssl:/etc/nginx/ssl:ro
+
+    # Ollama LLM Service
+  ollama:
+    image: ollama/ollama:latest
+    container_name: chatbot-ollama
+    restart: always
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+    networks:
+      - backend_network
+    # Uncomment for GPU support (requires nvidia-docker)
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+
+
+
+volumes:
+  chroma_db_data:
+    driver: local
+  ollama_data:
+    driver: local
+
+networks:
+  frontend_network:
+    driver: bridge
+  backend_network:
+    driver: bridge

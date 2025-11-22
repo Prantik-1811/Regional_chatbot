@@ -43,6 +43,29 @@ npm run dev               # opens http://localhost:5173
 ollama pull llama3.2
 The UI will load automatically; select a region and ask any cybersecurity question.
 
+## 🐳 Docker Deployment (Production)
+
+Deploy the chatbot as a production website using Docker:
+
+```bash
+# Quick start (HTTP only)
+docker-compose up -d
+
+# Access at http://your-server-ip or http://localhost
+```
+
+For full production deployment with HTTPS, SSL certificates, and cloud platform guides, see **[DEPLOYMENT.md](DEPLOYMENT.md)**.
+
+For details on managing the AI model (Ollama), GPU setup, and performance tuning, see **[AI_SETUP.md](AI_SETUP.md)**.
+
+**What's included:**
+- ✅ Nginx reverse proxy with rate limiting and security headers
+- ✅ Automatic container restarts
+- ✅ ChromaDB data persistence
+- ✅ Production-ready configuration
+- ✅ Cloud deployment guides (AWS, GCP, DigitalOcean, Azure)
+
+
 📖 Usage Example
 json
 POST /query
